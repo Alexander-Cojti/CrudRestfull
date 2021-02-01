@@ -1,87 +1,90 @@
 'use strict';
-const utils = require('../utils');
 const config = require('../../config');
 const sql = require('mssql');
 
-const getEvents = async () => {
+
+const getAllOffices = async () => {
     try {
-        let pool = await sql.connect(config.sql);
-        // const sqlQueries = await utils.loadSqlQueries('events');
-        const eventsList = await pool.request().query('[JES_GETITEM]');
-        return eventsList.recordset;
+        const pool = await sql.connect(config.sql);
+        const res = await pool.request().execute('SP_R_OFFICE');
+        return res.recordset;
     } catch (error) {
-        console.log(error.message);
+       return  error.message;
     }
 }
 
-const getById = async(eventId) => {
+const getOfficeById = async(Id) => {
     try {
-        let pool = await sql.connect(config.sql);
-        const sqlQueries = await utils.loadSqlQueries('events');
-        const event = await pool.request()
-                            .input('eventId', sql.Int, eventId)
-                            .query(sqlQueries.eventbyId);
-        return event.recordset;
+        const pool = await sql.connect(config.sql);
+        const res = await pool.request().input('Id', sql.Int, Id).execute('SP_R_OFFICE');
+        return res.recordset[0];
     } catch (error) {
         return error.message;
     }
 }
 
-const creatEvent = async (eventdata) => {
+const createOffice = async (data) => {
     try {
-        let pool = await sql.connect(config.sql);
-        // const sqlQueries = await utils.loadSqlQueries('events');
-        const insertEvent = await pool.request()
-        .input('ID', sql.Int, eventdata.ID)
-        .input('NAMEOFFICE', sql.NVarChar(250), eventdata.NAMEOFFICE)
-        .input('LOCATION', sql.NVarChar(250), eventdata.LOCATION)
-        .input('PHONE', sql.Int, eventdata.PHONE)
-        .input('LONGITUD', sql.NVarChar(50), eventdata.LONGITUD)
-        .input('LATITUD', sql.NVarChar(50), eventdata.LATITUD)
-        // .query(sqlQueries.createEvent);  
-        .execute('JES_INSERTORUPDATE')
-        return insertEvent.recordset;
+        const pool = await sql.connect(config.sql);
+        const res = await pool
+          .request()
+          .input("NAMEOFFICE", sql.NVarChar(250), data.NAMEOFFICE)
+          .input("LOCATION", sql.NVarChar(250), data.LOCATION)
+          .input("PHONE", sql.Int, data.PHONE)
+          .input("LONGITUD", sql.NVarChar(50), data.LONGITUD)
+          .input("LATITUD", sql.NVarChar(50), data.LATITUD)
+          .execute('SP_C_OFFICE');
+        return res.recordset[0];
     } catch (error) {
         return error.message;
     }
 }
 
-const updateEvent = async (eventId, data) => {
+const updateOffice = async (id,data) => {
     try {
-        let pool = await sql.connect(config.sql);
-        const sqlQueries = await utils.loadSqlQueries('events');
-        const update = await pool.request()
-                        .input('eventId', sql.Int, eventId)
-                        .input('eventTitle', sql.NVarChar(100), data.eventTitle)
-                        .input('eventDescription', sql.NVarChar(1500), data.eventDescription)
-                        .input('startDate', sql.Date, data.startDate)
-                        .input('endDate', sql.Date, data.endDate)
-                        .input('avenue', sql.NVarChar(200), data.avenue)
-                        .input('maxMembers', sql.Int, data.maxMembers)
-                        .query(sqlQueries.updateEvent);
-        return update.recordset;
+        const pool = await sql.connect(config.sql);
+        const res = await pool.request()
+        .input("ID", sql.Int, id)
+        .input("NAMEOFFICE", sql.NVarChar(250), data.NAMEOFFICE)
+        .input("LOCATION", sql.NVarChar(250), data.LOCATION)
+        .input("PHONE", sql.Int, data.PHONE)
+        .input("LONGITUD", sql.NVarChar(50), data.LONGITUD)
+        .input("LATITUD", sql.NVarChar(50), data.LATITUD)
+        .execute('SP_U_OFFICE');
+        return res.recordset;
     } catch (error) {
         return error.message;
     }
 }
 
-const deleteEvent = async (eventId) => {
+const deleteOffice = async (id) => {
     try {
-        let pool = await sql.connect(config.sql);
-        const sqlQueries = await utils.loadSqlQueries('events');
-        const deleteEvent = await pool.request()
-                            .input('eventId', sql.Int, eventId)
-                            .query(sqlQueries.deleteEvent);
-        return deleteEvent.recordset;
+        const pool = await sql.connect(config.sql);
+        const res = await pool.request().input('ID', sql.Int, id).execute('SP_D_OFFICE');
+        return res.recordset[0];
     } catch (error) {
         return error.message;
     }
 }
-
+const login = async (user, pass) => {
+    try {
+        const pool = await sql.connect(config.sql);
+        const res = await pool.request()
+        .input('USER', sql.VarChar(50), user)
+        .input('PASS', sql.VarChar(250), pass)
+        .execute('SP_LOGIN');
+        return res.recordset[0];
+    } catch (error) {
+        return error.message;
+    }
+}
 module.exports = {
-    getEvents,
-    getById,
-    creatEvent,
-    updateEvent,
-    deleteEvent
+    getAllOffices,
+    getOfficeById,
+    createOffice,
+    updateOffice,
+    deleteOffice,
+    login
 }
+// const utils = require('../utils');
+// const sqlQueries = await utils.loadSqlQueries('events');

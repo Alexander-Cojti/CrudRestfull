@@ -1,61 +1,59 @@
 'use strict';
-
 const eventData = require('../data/events');
 
-const getAllEvents = async (req, res, next) => {
+const getAllOffices = async (req, res, next) => {
     try {
-        const eventlist = await eventData.getEvents();
-        res.send(eventlist);        
+        res.send(await eventData.getAllOffices());        
     } catch (error) {
         res.status(400).send(error.message);
     }
 }
 
-const getEvent = async (req, res, next) => {
+const getOfficeById = async (req, res, next) => {
     try {
-        const eventId = req.params.id;
-        const event = await eventData.getById(eventId);
-        res.send(event);
+        res.send(await eventData.getOfficeById(req.params.id));
     } catch (error) {
         res.status(400).send(error.message);
     }
 }
 
-const addEvent = async (req, res, next) => {
+const createOffice = async (req, res, next) => {
     try {
-        const data = req.body;
-        const insert = await eventData.creatEvent(data);
-        res.send(insert);
+        res.send(await eventData.createOffice(req.body));
     } catch (error) {
         res.status(400).send(error.message);
     }
 }
 
-const updatEvent = async (req, res, next) => {
+const updateOffice = async (req, res, next) => {
     try {
-        const eventId =  req.params.id;
-        const data = req.body;
-        const updated = await eventData.updateEvent(eventId, data);
-        res.send(updated);
+        res.send(await eventData.updateOffice(req.params.id,req.body));
     } catch (error) {
         res.status(400).send(error.message);
     }
 }
 
-const deleteEvent = async (req, res, next) => {
+const deleteOffice = async (req, res, next) => {
     try {
-        const eventId = req.params.id;
-        const deletedEvent = await eventData.deleteEvent(eventId);
-        res.send(deletedEvent);
+        res.send(await eventData.deleteOffice( req.params.id));
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
+const login = async (req, res, next) => {
+    try {
+        res.send(await eventData.login( req.params.user,req.params.pass));
     } catch (error) {
         res.status(400).send(error.message);
     }
 }
 
 module.exports = {
-    getAllEvents,
-    getEvent,
-    addEvent,
-    updatEvent,
-    deleteEvent
+    getAllOffices,
+    getOfficeById,
+    createOffice,
+    updateOffice,
+    deleteOffice,
+    login
 }
